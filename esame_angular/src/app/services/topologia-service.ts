@@ -97,6 +97,18 @@ export class TopologiaService {
         }
     }
 
+    spostaDispositivo(varId: number, varX: number, varY: number): void {
+        const dispositivo = this.dispositivi().find(d => d.id == varId)
+
+        if(!dispositivo || (dispositivo.x == varX && dispositivo.y == varY)){
+            return
+        }
+
+        this.dispositivi.update(lista => lista.map(d => d.id == varId
+            ? { ...d, x: varX, y: varY }
+            : d))
+    }
+
     aggiungiDispositivo(varTipo: TipoDispositivo): void {
         const id = this.prossimoId()
         const numero = this.prossimoNumero(varTipo)

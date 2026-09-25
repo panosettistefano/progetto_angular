@@ -31,6 +31,36 @@ describe('TopologiaService', () => {
     expect(service.linee().length).toBe(0);
   });
 
+  it('should move a device creating a new object', () => {
+    const prima = service.dispositivi()[0];
+
+    service.spostaDispositivo(1, 100, 200);
+
+    const dopo = service.dispositivi()[0];
+
+    expect(dopo.x).toBe(100);
+    expect(dopo.y).toBe(200);
+    expect(dopo).not.toBe(prima);
+    expect(prima.x).toBe(600);
+  });
+
+  it('should not touch the list when the position does not change', () => {
+    const prima = service.dispositivi();
+
+    service.spostaDispositivo(1, 600, 120);
+
+    expect(service.dispositivi()).toBe(prima);
+  });
+
+  it('should update the lines when a device moves', () => {
+    service.spostaDispositivo(1, 300, 100);
+
+    const linea = service.linee().find(l => l.id == 1);
+
+    expect(linea?.x1).toBe(300);
+    expect(linea?.y1).toBe(100);
+  });
+
   it('should add a device with a new id and a progressive name', () => {
     service.aggiungiDispositivo("PC");
 

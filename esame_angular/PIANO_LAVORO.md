@@ -169,10 +169,10 @@ prova manuale con `npx ng serve`, poi un commit git con messaggio in italiano.
 
 | # | Stato | Obiettivo | File toccati |
 |---|---|---|---|
-| **M0** | da fare | Fondamenta: Bootstrap da CDN, pulizia del placeholder, `costanti.ts`, tipi, service con dispositivi di esempio, scheletro dei tre componenti | `PIANO_LAVORO.md`, `index.html`, `styles.css`, `app.*`, `costanti.ts`, `types/*`, `services/topologia-service.ts`, `components/*` |
-| **M1** | da fare | Canvas che disegna dispositivi, icone, colori per tipo e linee dal `computed linee()` | `canvas.*`, `styles.css` |
-| **M2** | da fare | Pulsanti "Aggiungi PC / Switch / Router": id univoco, nome progressivo, IP di default, posizione a scaletta | `strumenti.*`, `topologia-service.ts` |
-| **M3** | da fare | Drag & drop in modalità Edit con aggiornamento di `x`/`y` e limiti del canvas | `canvas.*`, `topologia-service.ts` |
+| **M0** | fatto | Fondamenta: Bootstrap da CDN, pulizia del placeholder, `costanti.ts`, tipi, service con dispositivi di esempio, scheletro dei tre componenti | `PIANO_LAVORO.md`, `index.html`, `styles.css`, `app.*`, `costanti.ts`, `types/*`, `services/topologia-service.ts`, `components/*` |
+| **M1** | fatto | Canvas che disegna dispositivi, icone, colori per tipo e linee dal `computed linee()` | `canvas.*`, `styles.css` |
+| **M2** | fatto | Pulsanti "Aggiungi PC / Switch / Router": id univoco, nome progressivo, IP di default, posizione a scaletta | `strumenti.*`, `topologia-service.ts` (+ spec) |
+| **M3** | fatto | Drag & drop in modalità Edit con aggiornamento di `x`/`y` e limiti del canvas | `canvas.*`, `topologia-service.ts` |
 | **M4** | da fare | Modalità Edit / Connect, evidenziazione del selezionato, creazione connessione con i controlli | `strumenti.*`, `canvas.*`, `topologia-service.ts` |
 | **M5** | da fare | Dettaglio con click destro: sidebar con nome, tipo, IP, hostname, stato | `dettaglio.*`, `canvas.*`, `topologia-service.ts` |
 | **M6** | da fare | Eliminazione dispositivo (con le sue connessioni) e singola connessione | `dettaglio.*`, `topologia-service.ts` |

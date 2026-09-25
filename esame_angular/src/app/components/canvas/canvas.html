@@ -26,6 +26,10 @@
                 [style.top.px]="dispositivo.y"
                 [style.width.px]="dimensione"
                 [style.height.px]="dimensione"
+                (pointerdown)="iniziaTrascinamento($event, dispositivo.id)"
+                (pointermove)="trascina($event)"
+                (pointerup)="finisciTrascinamento($event)"
+                (pointercancel)="finisciTrascinamento($event)"
             >
                 <i [class]="'bi ' + iconaDispositivo(dispositivo.tipo)"></i>
                 <span class="nome">{{ dispositivo.nome }}</span>

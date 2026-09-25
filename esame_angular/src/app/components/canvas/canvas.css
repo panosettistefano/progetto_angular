@@ -41,6 +41,12 @@
     border-radius: 0.75rem;
     background-color: #ffffff;
     user-select: none;
+    touch-action: none;
+    cursor: grab;
+}
+
+.dispositivo:active {
+    cursor: grabbing;
 }
 
 .dispositivo .bi {
