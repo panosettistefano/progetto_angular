@@ -1,0 +1,9 @@
+body {
+    background-color: #f2f4f7;
+}
+
+.pannello {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
