@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { Dispositivo, TipoDispositivo } from '../types/dispositivo';
 import { TopologiaService } from './topologia-service';
 
 describe('TopologiaService', () => {
@@ -9,16 +10,47 @@ describe('TopologiaService', () => {
     service = TestBed.inject(TopologiaService);
   });
 
+  function dispositivo(varId: number, varTipo: TipoDispositivo, varNome: string, varX: number, varY: number): Dispositivo {
+    return {
+      id: varId,
+      tipo: varTipo,
+      nome: varNome,
+      x: varX,
+      y: varY,
+      ip: "192.168.1." + varId,
+      hostname: varNome.toLowerCase(),
+      stato: "Online"
+    };
+  }
+
+  function popola(): void {
+    service.dispositivi.set([
+      dispositivo(1, "Router", "Router-01", 600, 120),
+      dispositivo(2, "Switch", "Switch-01", 600, 340),
+      dispositivo(3, "PC", "PC-01", 360, 560),
+      dispositivo(4, "PC", "PC-02", 840, 560)
+    ]);
+
+    service.connessioni.set([
+      { id: 1, sourceId: 1, targetId: 2 },
+      { id: 2, sourceId: 2, targetId: 3 },
+      { id: 3, sourceId: 2, targetId: 4 }
+    ]);
+  }
+
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should start with the example topology', () => {
-    expect(service.dispositivi().length).toBe(4);
-    expect(service.connessioni().length).toBe(3);
+  it('should start with an empty canvas', () => {
+    expect(service.dispositivi().length).toBe(0);
+    expect(service.connessioni().length).toBe(0);
+    expect(service.linee().length).toBe(0);
   });
 
   it('should build one line for each connection', () => {
+    popola();
+
     const linee = service.linee();
 
     expect(linee.length).toBe(3);
@@ -26,12 +58,16 @@ describe('TopologiaService', () => {
   });
 
   it('should not build a line when a device is missing', () => {
+    popola();
+
     service.dispositivi.set(service.dispositivi().filter(d => d.id != 2));
 
     expect(service.linee().length).toBe(0);
   });
 
   it('should move a device creating a new object', () => {
+    popola();
+
     const prima = service.dispositivi()[0];
 
     service.spostaDispositivo(1, 100, 200);
@@ -45,6 +81,8 @@ describe('TopologiaService', () => {
   });
 
   it('should not touch the list when the position does not change', () => {
+    popola();
+
     const prima = service.dispositivi();
 
     service.spostaDispositivo(1, 600, 120);
@@ -53,6 +91,8 @@ describe('TopologiaService', () => {
   });
 
   it('should update the lines when a device moves', () => {
+    popola();
+
     service.spostaDispositivo(1, 300, 100);
 
     const linea = service.linee().find(l => l.id == 1);
@@ -63,17 +103,24 @@ describe('TopologiaService', () => {
 
   it('should add a device with a new id and a progressive name', () => {
     service.aggiungiDispositivo("PC");
+    service.aggiungiDispositivo("PC");
 
-    const nuovo = service.dispositivi()[4];
+    const primo = service.dispositivi()[0];
+    const secondo = service.dispositivi()[1];
 
-    expect(service.dispositivi().length).toBe(5);
-    expect(nuovo.id).toBe(5);
-    expect(nuovo.nome).toBe("PC-03");
-    expect(nuovo.hostname).toBe("pc-03");
-    expect(nuovo.stato).toBe("Online");
+    expect(service.dispositivi().length).toBe(2);
+    expect(primo.id).toBe(1);
+    expect(primo.nome).toBe("PC-01");
+    expect(primo.hostname).toBe("pc-01");
+    expect(primo.ip).toBe("192.168.1.101");
+    expect(primo.stato).toBe("Online");
+    expect(secondo.id).toBe(2);
+    expect(secondo.nome).toBe("PC-02");
   });
 
   it('should keep ids unique after a device is removed', () => {
+    popola();
+
     service.dispositivi.set(service.dispositivi().filter(d => d.id != 4));
 
     service.aggiungiDispositivo("PC");
@@ -84,6 +131,8 @@ describe('TopologiaService', () => {
   });
 
   it('should not overlap the new device with the existing ones', () => {
+    popola();
+
     service.aggiungiDispositivo("Switch");
 
     const nuovo = service.dispositivi()[4];
@@ -104,6 +153,8 @@ describe('TopologiaService', () => {
   });
 
   it('should ignore the click on a device in edit mode', () => {
+    popola();
+
     service.cliccaDispositivo(1);
 
     expect(service.selezionato()).toBeNull();
@@ -111,6 +162,8 @@ describe('TopologiaService', () => {
   });
 
   it('should select a device with the first click in connect mode', () => {
+    popola();
+
     service.cambiaModalita("connect");
 
     service.cliccaDispositivo(1);
@@ -120,6 +173,8 @@ describe('TopologiaService', () => {
   });
 
   it('should deselect the device clicked twice', () => {
+    popola();
+
     service.cambiaModalita("connect");
 
     service.cliccaDispositivo(1);
@@ -130,6 +185,8 @@ describe('TopologiaService', () => {
   });
 
   it('should create the connection with the second click on another device', () => {
+    popola();
+
     service.cambiaModalita("connect");
 
     service.cliccaDispositivo(1);
@@ -144,6 +201,8 @@ describe('TopologiaService', () => {
   });
 
   it('should not connect a device to itself', () => {
+    popola();
+
     const avviso = vi.spyOn(window, "alert").mockImplementation(() => {});
 
     service.creaConnessione(1, 1);
@@ -153,6 +212,8 @@ describe('TopologiaService', () => {
   });
 
   it('should not duplicate a connection in both directions', () => {
+    popola();
+
     const avviso = vi.spyOn(window, "alert").mockImplementation(() => {});
 
     service.creaConnessione(2, 1);

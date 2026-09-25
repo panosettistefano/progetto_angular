@@ -28,6 +28,17 @@
     stroke-linecap: round;
 }
 
+.messaggio-vuoto {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    color: #adb5bd;
+    text-align: center;
+    pointer-events: none;
+}
+
 .dispositivo {
     position: absolute;
     z-index: 1;

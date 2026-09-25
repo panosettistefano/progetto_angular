@@ -33,6 +33,12 @@
                 }
             </svg>
 
+            @if (service.dispositivi().length == 0) {
+            <p class="messaggio-vuoto">
+                Il canvas è vuoto: aggiungi un PC, uno Switch o un Router con i pulsanti qui sopra.
+            </p>
+            }
+
             @for (dispositivo of service.dispositivi(); track dispositivo.id) {
             <div
                 [class]="'dispositivo ' + classeDispositivo(dispositivo.tipo)"
