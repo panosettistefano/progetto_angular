@@ -1,4 +1,17 @@
 <div class="pannello p-3 mb-3">
-    <h5 class="mb-3">Strumenti</h5>
-    <p class="text-muted mb-0">Da completare: aggiunta dispositivi, modalità Edit/Connect, salvataggio.</p>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <span class="fw-semibold me-2">Aggiungi dispositivo:</span>
+
+        <button class="btn btn-outline-primary" (click)="service.aggiungiDispositivo('PC')">
+            <i class="bi bi-pc-display me-1"></i>PC
+        </button>
+
+        <button class="btn btn-outline-success" (click)="service.aggiungiDispositivo('Switch')">
+            <i class="bi bi-hdd-network me-1"></i>Switch
+        </button>
+
+        <button class="btn btn-outline-warning" (click)="service.aggiungiDispositivo('Router')">
+            <i class="bi bi-router me-1"></i>Router
+        </button>
+    </div>
 </div>

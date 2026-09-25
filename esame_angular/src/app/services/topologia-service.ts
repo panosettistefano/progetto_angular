@@ -1,6 +1,7 @@
 import { Service, computed, signal } from '@angular/core';
+import { ALTEZZA_CANVAS, LARGHEZZA_CANVAS } from '../costanti';
 import { Connessione } from '../types/connessione';
-import { Dispositivo } from '../types/dispositivo';
+import { Dispositivo, TipoDispositivo } from '../types/dispositivo';
 import { Linea } from '../types/linea';
 
 @Service()
@@ -94,6 +95,63 @@ export class TopologiaService {
             x2: destinazione.x,
             y2: destinazione.y
         }
+    }
+
+    aggiungiDispositivo(varTipo: TipoDispositivo): void {
+        const id = this.prossimoId()
+        const numero = this.prossimoNumero(varTipo)
+        const posizione = this.posizioneLibera()
+
+        this.dispositivi.update(lista => [
+            ...lista,
+            {
+                id: id,
+                tipo: varTipo,
+                nome: varTipo + "-" + this.dueCifre(numero),
+                x: posizione.x,
+                y: posizione.y,
+                ip: "192.168.1." + (100 + id),
+                hostname: varTipo.toLowerCase() + "-" + this.dueCifre(numero),
+                stato: "Online"
+            }
+        ])
+    }
+
+    private prossimoId(): number {
+        const id = this.dispositivi().map(d => d.id)
+
+        return Math.max(0, ...id) + 1
+    }
+
+    private prossimoNumero(varTipo: TipoDispositivo): number {
+        const numeri = this.dispositivi()
+            .filter(d => d.tipo == varTipo)
+            .map(d => parseInt(d.nome.replace(varTipo + "-", "")))
+            .filter(n => !isNaN(n))
+
+        return Math.max(0, ...numeri) + 1
+    }
+
+    private posizioneLibera(): { x: number, y: number } {
+        const passo = 100
+        let x = passo
+        let y = passo
+
+        while (y < ALTEZZA_CANVAS - passo && this.dispositivi()
+            .some(d => Math.abs(d.x - x) < passo && Math.abs(d.y - y) < passo)) {
+            x = x + passo
+
+            if (x > LARGHEZZA_CANVAS - passo) {
+                x = passo
+                y = y + passo
+            }
+        }
+
+        return { x: x, y: y }
+    }
+
+    private dueCifre(varNumero: number): string {
+        return varNumero.toString().padStart(2, "0")
     }
 
 }

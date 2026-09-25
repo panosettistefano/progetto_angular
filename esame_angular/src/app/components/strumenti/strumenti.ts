@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { TopologiaService } from '../../services/topologia-service';
 
 @Component({
   imports: [],
@@ -6,4 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './strumenti.css',
   templateUrl: './strumenti.html',
 })
-export class Strumenti {}
+export class Strumenti {
+
+  service = inject(TopologiaService);
+
+}
