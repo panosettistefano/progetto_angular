@@ -12,7 +12,7 @@
         </button>
     </div>
 
-    <dl class="row mb-0">
+    <dl class="row mb-3">
         <dt class="col-4">Tipo</dt>
         <dd class="col-8">{{ dispositivo.tipo }}</dd>
 
@@ -27,5 +27,21 @@
             <span [class]="'badge ' + classeStato(dispositivo.stato)">{{ dispositivo.stato }}</span>
         </dd>
     </dl>
+
+    @if (dispositivo.stato == 'Online') {
+    <button type="button" class="btn btn-outline-danger w-100" (click)="service.disattivaStato(dispositivo.id)">
+        <i class="bi bi-power me-1"></i>Disattiva stato
+    </button>
+    } @else {
+    <button type="button" class="btn btn-outline-success w-100" (click)="service.attivaStato(dispositivo.id)">
+        <i class="bi bi-power me-1"></i>Attiva stato
+    </button>
+    }
+
+    @if (dispositivo.tipo == 'Router' && dispositivo.stato != 'Online') {
+    <p class="text-muted small mt-2 mb-0">
+        Attivando il router arriva internet: si accendono anche gli switch e i PC collegati.
+    </p>
+    }
 </aside>
 }

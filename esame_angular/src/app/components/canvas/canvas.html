@@ -43,6 +43,7 @@
             <div
                 [class]="'dispositivo ' + classeDispositivo(dispositivo.tipo)"
                 [class.selezionato]="service.selezionato() == dispositivo.id"
+                [class.dispositivo-offline]="dispositivo.stato == 'Offline'"
                 [style.left.px]="dispositivo.x"
                 [style.top.px]="dispositivo.y"
                 [style.width.px]="dimensione"

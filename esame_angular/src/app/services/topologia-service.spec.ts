@@ -113,7 +113,7 @@ describe('TopologiaService', () => {
     expect(primo.nome).toBe("PC-01");
     expect(primo.hostname).toBe("pc-01");
     expect(primo.ip).toBe("192.168.1.101");
-    expect(primo.stato).toBe("Online");
+    expect(primo.stato).toBe("Offline");
     expect(secondo.id).toBe(2);
     expect(secondo.nome).toBe("PC-02");
   });
@@ -253,5 +253,52 @@ describe('TopologiaService', () => {
     service.dispositivi.set(service.dispositivi().filter(d => d.id != 2));
 
     expect(service.dispositivoDettaglio()).toBeNull();
+  });
+
+  it('should activate and deactivate a device', () => {
+    popola();
+
+    service.disattivaStato(3);
+
+    expect(service.dispositivi()[2].stato).toBe("Offline");
+
+    service.attivaStato(3);
+
+    expect(service.dispositivi()[2].stato).toBe("Online");
+  });
+
+  it('should not activate the other devices', () => {
+    popola();
+
+    service.disattivaStato(3);
+    service.disattivaStato(4);
+
+    service.attivaStato(3);
+
+    expect(service.dispositivi()[2].stato).toBe("Online");
+    expect(service.dispositivi()[3].stato).toBe("Offline");
+  });
+
+  it('should switch on every connected device when the router is activated', () => {
+    popola();
+
+    service.dispositivi.update(lista => lista.map(d => ({ ...d, stato: "Offline" })));
+
+    service.attivaStato(1);
+
+    const spenti = service.dispositivi().filter(d => d.stato != "Online");
+
+    expect(service.dispositivi()[0].stato).toBe("Online");
+    expect(spenti.length).toBe(0);
+  });
+
+  it('should not switch on a device that is not connected to the router', () => {
+    popola();
+
+    service.aggiungiDispositivo("PC");
+    service.attivaStato(1);
+
+    expect(service.dispositivi()[0].stato).toBe("Online");
+    expect(service.dispositivi()[4].stato).toBe("Offline");
   });
 });

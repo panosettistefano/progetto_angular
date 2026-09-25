@@ -49,7 +49,10 @@ Lo sviluppo è diviso in **due fasi**:
 | Test | **Vitest** (`npx ng test --watch=false`) | `jsdom` come ambiente |
 | Linguaggio | italiano per entità, metodi e campi | |
 
-Extra inclusi: **eliminazione di un dispositivo** e **di una connessione**.
+Extra inclusi: **eliminazione di un dispositivo** e **di una connessione**, più l'**attivazione dello stato
+dal pannello di dettaglio**: i dispositivi nascono `Offline` e si accendono dal pulsante nella sidebar;
+attivando un **Router** lo stato `Online` si propaga a tutti i dispositivi raggiungibili attraverso le
+connessioni (è il router che porta internet).
 Esclusi: zoom/pan del canvas, export/import JSON, modifica di nome/IP dal pannello.
 
 ## 3. Architettura del frontend
@@ -99,8 +102,9 @@ connessioniDettaglio = computed(...)           // connessioni che toccano il dis
 ```
 
 Metodi principali: `aggiungiDispositivo`, `spostaDispositivo`, `cliccaDispositivo`,
-`creaConnessione`, `eliminaDispositivo`, `eliminaConnessione`, `cambiaModalita`, `apriDettaglio`,
-`chiudiDettaglio`, `salvaTopologia`, `caricaTopologia`, `cancellaTopologia`.
+`creaConnessione`, `eliminaDispositivo`, `eliminaConnessione`, `attivaStato`, `disattivaStato`,
+`cambiaModalita`, `apriDettaglio`, `chiudiDettaglio`, `salvaTopologia`, `caricaTopologia`,
+`cancellaTopologia`.
 
 Regola: **mai mutare gli oggetti in place**, sempre `update(lista => lista.map(...))`, altrimenti i
 `computed` non si accorgono del cambiamento e le linee restano ferme.

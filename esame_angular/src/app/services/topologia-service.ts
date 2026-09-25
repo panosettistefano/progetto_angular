@@ -70,7 +70,7 @@ export class TopologiaService {
                 y: posizione.y,
                 ip: "192.168.1." + (100 + id),
                 hostname: varTipo.toLowerCase() + "-" + this.dueCifre(numero),
-                stato: "Online"
+                stato: "Offline"
             }
         ])
     }
@@ -134,6 +134,63 @@ export class TopologiaService {
 
     chiudiDettaglio(): void {
         this.idDettaglio.set(null)
+    }
+
+    attivaStato(varId: number): void {
+        const dispositivo = this.dispositivi().find(d => d.id == varId)
+
+        if (!dispositivo) {
+            return
+        }
+
+        const id = dispositivo.tipo == "Router"
+            ? [varId, ...this.raggiungibili(varId)]
+            : [varId]
+
+        this.dispositivi.update(lista => lista.map(d => id.includes(d.id)
+            ? { ...d, stato: "Online" }
+            : d))
+    }
+
+    disattivaStato(varId: number): void {
+        const dispositivo = this.dispositivi().find(d => d.id == varId)
+
+        if (!dispositivo) {
+            return
+        }
+
+        this.dispositivi.update(lista => lista.map(d => d.id == varId
+            ? { ...d, stato: "Offline" }
+            : d))
+    }
+
+    private raggiungibili(varId: number): number[] {
+        const visitati: number[] = []
+        const coda: number[] = [varId]
+
+        for (let i = 0; i < coda.length; i++) {
+            for (const connessione of this.connessioni()) {
+                const vicino = this.vicino(connessione, coda[i])
+
+                if (vicino != null && vicino != varId && !visitati.includes(vicino)) {
+                    visitati.push(vicino)
+                    coda.push(vicino)
+                }
+            }
+        }
+
+        return visitati
+    }
+
+    private vicino(varConnessione: Connessione, varId: number): number | null {
+        if (varConnessione.sourceId == varId) {
+            return varConnessione.targetId
+        }
+        if (varConnessione.targetId == varId) {
+            return varConnessione.sourceId
+        }
+
+        return null
     }
 
     private collegati(varSorgente: number, varDestinazione: number): boolean {

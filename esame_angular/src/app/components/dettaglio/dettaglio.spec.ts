@@ -88,6 +88,40 @@ describe('Dettaglio', () => {
     expect(fixture.nativeElement.querySelector('.sidebar-dettaglio')).toBeNull();
   });
 
+  function pulsanteStato(): HTMLButtonElement {
+    const pulsanti = Array.from(fixture.nativeElement.querySelectorAll('.sidebar-dettaglio button')) as HTMLButtonElement[];
+
+    return pulsanti.find(p => p.textContent?.includes("stato")) as HTMLButtonElement;
+  }
+
+  it('should activate the state from the sidebar', async () => {
+    popola();
+    service.disattivaStato(1);
+    service.apriDettaglio(1);
+    await fixture.whenStable();
+
+    expect(pulsanteStato().textContent).toContain("Attiva stato");
+
+    pulsanteStato().click();
+    await fixture.whenStable();
+
+    expect(service.dispositivi()[0].stato).toBe("Online");
+    expect(fixture.nativeElement.textContent).toContain("Online");
+    expect(pulsanteStato().textContent).toContain("Disattiva stato");
+  });
+
+  it('should deactivate the state from the sidebar', async () => {
+    popola();
+    service.apriDettaglio(1);
+    await fixture.whenStable();
+
+    pulsanteStato().click();
+    await fixture.whenStable();
+
+    expect(service.dispositivi()[0].stato).toBe("Offline");
+    expect(pulsanteStato().textContent).toContain("Attiva stato");
+  });
+
   it('should give a colour to every state', () => {
     expect(component.classeStato("Online")).toBe("text-bg-success");
     expect(component.classeStato("Offline")).toBe("text-bg-danger");
