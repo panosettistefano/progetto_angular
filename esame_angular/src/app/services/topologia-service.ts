@@ -1,6 +1,7 @@
-import { Service, signal } from '@angular/core';
+import { Service, computed, signal } from '@angular/core';
 import { Connessione } from '../types/connessione';
 import { Dispositivo } from '../types/dispositivo';
+import { Linea } from '../types/linea';
 
 @Service()
 export class TopologiaService {
@@ -73,5 +74,26 @@ export class TopologiaService {
     selezionato = signal<number | null>(null)
 
     idDettaglio = signal<number | null>(null)
+
+    linee = computed(() => this.connessioni()
+        .map(connessione => this.creaLinea(connessione))
+        .filter((linea): linea is Linea => linea != null))
+
+    creaLinea(varConnessione: Connessione): Linea | null {
+        const sorgente = this.dispositivi().find(d => d.id == varConnessione.sourceId)
+        const destinazione = this.dispositivi().find(d => d.id == varConnessione.targetId)
+
+        if(!sorgente || !destinazione){
+            return null
+        }
+
+        return {
+            id: varConnessione.id,
+            x1: sorgente.x,
+            y1: sorgente.y,
+            x2: destinazione.x,
+            y2: destinazione.y
+        }
+    }
 
 }

@@ -1,6 +1,36 @@
 <div class="pannello p-3">
-    <h5 class="mb-3">Canvas</h5>
-    <p class="text-muted mb-0">
-        Dispositivi presenti: {{ service.dispositivi().length }} - connessioni: {{ service.connessioni().length }}
-    </p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Canvas</h5>
+        <span class="text-muted small">
+            Dispositivi: {{ service.dispositivi().length }} - Connessioni: {{ service.connessioni().length }}
+        </span>
+    </div>
+
+    <div class="viewport">
+        <div class="piano" [style.width.px]="larghezza" [style.height.px]="altezza">
+            <svg class="linee">
+                @for (linea of service.linee(); track linea.id) {
+                <line
+                    [attr.x1]="linea.x1"
+                    [attr.y1]="linea.y1"
+                    [attr.x2]="linea.x2"
+                    [attr.y2]="linea.y2"
+                />
+                }
+            </svg>
+
+            @for (dispositivo of service.dispositivi(); track dispositivo.id) {
+            <div
+                [class]="'dispositivo ' + classeDispositivo(dispositivo.tipo)"
+                [style.left.px]="dispositivo.x"
+                [style.top.px]="dispositivo.y"
+                [style.width.px]="dimensione"
+                [style.height.px]="dimensione"
+            >
+                <i [class]="'bi ' + iconaDispositivo(dispositivo.tipo)"></i>
+                <span class="nome">{{ dispositivo.nome }}</span>
+            </div>
+            }
+        </div>
+    </div>
 </div>
