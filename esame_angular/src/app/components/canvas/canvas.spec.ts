@@ -103,4 +103,100 @@ describe('Canvas', () => {
     expect(dispositivo(1).x).toBe(600);
     expect(dispositivo(1).y).toBe(120);
   });
+
+  it('should not move the device in connect mode', async () => {
+    service.cambiaModalita("connect");
+
+    const router = nodo("Router-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointermove", 400, 400));
+    router.dispatchEvent(evento("pointerup", 400, 400));
+    await fixture.whenStable();
+
+    expect(dispositivo(1).x).toBe(600);
+    expect(dispositivo(1).y).toBe(120);
+  });
+
+  it('should select the device clicked in connect mode', async () => {
+    service.cambiaModalita("connect");
+
+    const router = nodo("Router-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointerup", 600, 120));
+    await fixture.whenStable();
+
+    expect(service.selezionato()).toBe(1);
+    expect(router.classList.contains("selezionato")).toBe(true);
+  });
+
+  it('should create the connection with two clicks in connect mode', async () => {
+    service.cambiaModalita("connect");
+
+    const router = nodo("Router-01");
+    const pc = nodo("PC-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointerup", 600, 120));
+    pc.dispatchEvent(evento("pointerdown", 360, 560));
+    pc.dispatchEvent(evento("pointerup", 360, 560));
+    await fixture.whenStable();
+
+    expect(service.connessioni().length).toBe(4);
+    expect(service.linee().length).toBe(4);
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should not select the device when the pointer has dragged', async () => {
+    service.cambiaModalita("connect");
+
+    const router = nodo("Router-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointermove", 500, 220));
+    router.dispatchEvent(evento("pointerup", 500, 220));
+    await fixture.whenStable();
+
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should not select the device when the drag is cancelled', async () => {
+    service.cambiaModalita("connect");
+
+    const router = nodo("Router-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointercancel", 600, 120));
+    await fixture.whenStable();
+
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should not select the device on a clean click in edit mode', async () => {
+    const router = nodo("Router-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointerup", 600, 120));
+    await fixture.whenStable();
+
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should remove the highlight when the mode changes', async () => {
+    service.cambiaModalita("connect");
+
+    const router = nodo("Router-01");
+
+    router.dispatchEvent(evento("pointerdown", 600, 120));
+    router.dispatchEvent(evento("pointerup", 600, 120));
+    await fixture.whenStable();
+
+    service.cambiaModalita("edit");
+    await fixture.whenStable();
+
+    expect(service.selezionato()).toBeNull();
+    expect(router.classList.contains("selezionato")).toBe(false);
+    expect(router.classList.contains("dispositivo")).toBe(true);
+  });
 });

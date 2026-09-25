@@ -3,6 +3,7 @@ import {
   ALTEZZA_CANVAS,
   DIMENSIONE_DISPOSITIVO,
   LARGHEZZA_CANVAS,
+  SOGLIA_TRASCINAMENTO,
 } from '../../costanti';
 import { TopologiaService } from '../../services/topologia-service';
 import { TipoDispositivo } from '../../types/dispositivo';
@@ -23,7 +24,11 @@ export class Canvas {
 
   dimensione = DIMENSIONE_DISPOSITIVO;
 
-  idTrascinato: number | null = null;
+  idPremuto: number | null = null;
+
+  partenzaX = 0;
+
+  partenzaY = 0;
 
   scostamentoX = 0;
 
@@ -57,20 +62,27 @@ export class Canvas {
       return;
     }
 
-    const piano = elemento.parentElement.getBoundingClientRect();
-
     elemento.setPointerCapture?.(varEvento.pointerId);
 
-    this.idTrascinato = varId;
+    this.idPremuto = varId;
+    this.partenzaX = varEvento.clientX;
+    this.partenzaY = varEvento.clientY;
+
+    if (this.service.modalita() != "edit") {
+      return;
+    }
+
+    const piano = elemento.parentElement.getBoundingClientRect();
+
     this.scostamentoX = varEvento.clientX - piano.left - dispositivo.x;
     this.scostamentoY = varEvento.clientY - piano.top - dispositivo.y;
   }
 
   trascina(varEvento: PointerEvent): void {
-    const id = this.idTrascinato;
+    const id = this.idPremuto;
     const elemento = varEvento.currentTarget as HTMLElement;
 
-    if (id == null || !elemento.parentElement) {
+    if (id == null || !elemento.parentElement || this.service.modalita() != "edit") {
       return;
     }
 
@@ -83,14 +95,31 @@ export class Canvas {
 
   finisciTrascinamento(varEvento: PointerEvent): void {
     const elemento = varEvento.currentTarget as HTMLElement;
+    const id = this.idPremuto;
 
-    if (this.idTrascinato == null) {
+    if (id == null) {
       return;
     }
 
     elemento.releasePointerCapture?.(varEvento.pointerId);
 
-    this.idTrascinato = null;
+    this.idPremuto = null;
+
+    if (this.distanza(varEvento) < SOGLIA_TRASCINAMENTO) {
+      this.service.cliccaDispositivo(id);
+    }
+  }
+
+  annullaTrascinamento(varEvento: PointerEvent): void {
+    const elemento = varEvento.currentTarget as HTMLElement;
+
+    elemento.releasePointerCapture?.(varEvento.pointerId);
+
+    this.idPremuto = null;
+  }
+
+  private distanza(varEvento: PointerEvent): number {
+    return Math.hypot(varEvento.clientX - this.partenzaX, varEvento.clientY - this.partenzaY);
   }
 
   private limita(varValore: number, varMassimo: number): number {

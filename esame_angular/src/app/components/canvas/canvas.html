@@ -1,13 +1,27 @@
 <div class="pannello p-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <h5 class="mb-0">Canvas</h5>
-        <span class="text-muted small">
-            Dispositivi: {{ service.dispositivi().length }} - Connessioni: {{ service.connessioni().length }}
-        </span>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-end gap-3">
+            @if (service.modalita() == 'edit') {
+            <span class="badge text-bg-secondary">Modalità modifica</span>
+            } @else {
+            <span class="badge text-bg-warning">Clicca il primo dispositivo, poi il secondo da collegare</span>
+            }
+
+            <span class="text-muted small">
+                Dispositivi: {{ service.dispositivi().length }} - Connessioni: {{ service.connessioni().length }}
+            </span>
+        </div>
     </div>
 
     <div class="viewport">
-        <div class="piano" [style.width.px]="larghezza" [style.height.px]="altezza">
+        <div
+            class="piano"
+            [class.modalita-connect]="service.modalita() == 'connect'"
+            [style.width.px]="larghezza"
+            [style.height.px]="altezza"
+        >
             <svg class="linee">
                 @for (linea of service.linee(); track linea.id) {
                 <line
@@ -22,6 +36,7 @@
             @for (dispositivo of service.dispositivi(); track dispositivo.id) {
             <div
                 [class]="'dispositivo ' + classeDispositivo(dispositivo.tipo)"
+                [class.selezionato]="service.selezionato() == dispositivo.id"
                 [style.left.px]="dispositivo.x"
                 [style.top.px]="dispositivo.y"
                 [style.width.px]="dimensione"
@@ -29,7 +44,7 @@
                 (pointerdown)="iniziaTrascinamento($event, dispositivo.id)"
                 (pointermove)="trascina($event)"
                 (pointerup)="finisciTrascinamento($event)"
-                (pointercancel)="finisciTrascinamento($event)"
+                (pointercancel)="annullaTrascinamento($event)"
             >
                 <i [class]="'bi ' + iconaDispositivo(dispositivo.tipo)"></i>
                 <span class="nome">{{ dispositivo.nome }}</span>

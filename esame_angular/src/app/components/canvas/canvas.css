@@ -49,6 +49,15 @@
     cursor: grabbing;
 }
 
+.dispositivo.selezionato {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 0 0 5px rgba(13, 110, 253, 0.45);
+}
+
+.modalita-connect .dispositivo {
+    cursor: crosshair;
+}
+
 .dispositivo .bi {
     font-size: 1.7rem;
 }

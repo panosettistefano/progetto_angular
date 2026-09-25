@@ -93,4 +93,71 @@ describe('TopologiaService', () => {
 
     expect(sovrapposti.length).toBe(0);
   });
+
+  it('should change mode and clear the selection', () => {
+    service.selezionato.set(1);
+
+    service.cambiaModalita("connect");
+
+    expect(service.modalita()).toBe("connect");
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should ignore the click on a device in edit mode', () => {
+    service.cliccaDispositivo(1);
+
+    expect(service.selezionato()).toBeNull();
+    expect(service.connessioni().length).toBe(3);
+  });
+
+  it('should select a device with the first click in connect mode', () => {
+    service.cambiaModalita("connect");
+
+    service.cliccaDispositivo(1);
+
+    expect(service.selezionato()).toBe(1);
+    expect(service.connessioni().length).toBe(3);
+  });
+
+  it('should deselect the device clicked twice', () => {
+    service.cambiaModalita("connect");
+
+    service.cliccaDispositivo(1);
+    service.cliccaDispositivo(1);
+
+    expect(service.selezionato()).toBeNull();
+    expect(service.connessioni().length).toBe(3);
+  });
+
+  it('should create the connection with the second click on another device', () => {
+    service.cambiaModalita("connect");
+
+    service.cliccaDispositivo(1);
+    service.cliccaDispositivo(4);
+
+    const nuova = service.connessioni()[3];
+
+    expect(service.connessioni().length).toBe(4);
+    expect(nuova).toEqual({ id: 4, sourceId: 1, targetId: 4 });
+    expect(service.linee().length).toBe(4);
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should not connect a device to itself', () => {
+    const avviso = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    service.creaConnessione(1, 1);
+
+    expect(service.connessioni().length).toBe(3);
+    expect(avviso).toHaveBeenCalled();
+  });
+
+  it('should not duplicate a connection in both directions', () => {
+    const avviso = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    service.creaConnessione(2, 1);
+
+    expect(service.connessioni().length).toBe(3);
+    expect(avviso).toHaveBeenCalled();
+  });
 });

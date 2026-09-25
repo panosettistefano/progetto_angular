@@ -110,7 +110,7 @@ export class TopologiaService {
     }
 
     aggiungiDispositivo(varTipo: TipoDispositivo): void {
-        const id = this.prossimoId()
+        const id = this.prossimoId(this.dispositivi().map(d => d.id))
         const numero = this.prossimoNumero(varTipo)
         const posizione = this.posizioneLibera()
 
@@ -129,10 +129,67 @@ export class TopologiaService {
         ])
     }
 
-    private prossimoId(): number {
-        const id = this.dispositivi().map(d => d.id)
+    cambiaModalita(varModalita: "edit" | "connect"): void {
+        if (this.modalita() == varModalita) {
+            return
+        }
 
-        return Math.max(0, ...id) + 1
+        this.modalita.set(varModalita)
+        this.selezionato.set(null)
+    }
+
+    cliccaDispositivo(varId: number): void {
+        if (this.modalita() != "connect") {
+            return
+        }
+
+        const sorgente = this.selezionato()
+
+        if (sorgente == null) {
+            this.selezionato.set(varId)
+            return
+        }
+
+        if (sorgente == varId) {
+            this.selezionato.set(null)
+            return
+        }
+
+        this.creaConnessione(sorgente, varId)
+        this.selezionato.set(null)
+    }
+
+    creaConnessione(varSorgente: number, varDestinazione: number): void {
+        if (varSorgente == varDestinazione) {
+            alert("Un dispositivo non può essere collegato a sé stesso.")
+            return
+        }
+
+        if (this.collegati(varSorgente, varDestinazione)) {
+            alert("Questi due dispositivi sono già collegati.")
+            return
+        }
+
+        const id = this.prossimoId(this.connessioni().map(c => c.id))
+
+        this.connessioni.update(lista => [
+            ...lista,
+            {
+                id: id,
+                sourceId: varSorgente,
+                targetId: varDestinazione
+            }
+        ])
+    }
+
+    private collegati(varSorgente: number, varDestinazione: number): boolean {
+        return this.connessioni().some(c =>
+            (c.sourceId == varSorgente && c.targetId == varDestinazione)
+            || (c.sourceId == varDestinazione && c.targetId == varSorgente))
+    }
+
+    private prossimoId(varIds: number[]): number {
+        return Math.max(0, ...varIds) + 1
     }
 
     private prossimoNumero(varTipo: TipoDispositivo): number {
