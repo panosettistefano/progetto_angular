@@ -27,7 +27,7 @@ Lo sviluppo è diviso in **due fasi**:
 - [x] **drag & drop** dei dispositivi con aggiornamento delle coordinate
 - [x] **connessioni** create con due click (il primo evidenzia la sorgente), modello `{ id, sourceId, targetId }`
 - [x] le linee si aggiornano automaticamente quando un dispositivo viene spostato
-- [ ] **click destro** su un dispositivo → dettaglio (nome, tipo, IP, hostname, stato) in una **sidebar**
+- [x] **click destro** su un dispositivo → dettaglio (nome, tipo, IP, hostname, stato) in una **sidebar**
 - [x] modalità **Edit / Connect** separate (bonus avanzato)
 - [ ] **salva / carica / cancella topologia** su Local Storage, e poi anche sul server
 - [ ] `README.md` con descrizione, tecnologie, architettura, modello dati, istruzioni di avvio e
@@ -174,7 +174,7 @@ prova manuale con `npx ng serve`, poi un commit git con messaggio in italiano.
 | **M2** | fatto | Pulsanti "Aggiungi PC / Switch / Router": id univoco, nome progressivo, IP di default, posizione a scaletta | `strumenti.*`, `topologia-service.ts` (+ spec) |
 | **M3** | fatto | Drag & drop in modalità Edit con aggiornamento di `x`/`y` e limiti del canvas | `canvas.*`, `topologia-service.ts` |
 | **M4** | fatto | Modalità Edit / Connect, evidenziazione del selezionato, creazione connessione con i controlli | `strumenti.*`, `canvas.*`, `topologia-service.ts` |
-| **M5** | da fare | Dettaglio con click destro: sidebar con nome, tipo, IP, hostname, stato | `dettaglio.*`, `canvas.*`, `topologia-service.ts` |
+| **M5** | fatto | Dettaglio con click destro: sidebar con nome, tipo, IP, hostname, stato | `dettaglio.*`, `canvas.*`, `topologia-service.ts` |
 | **M6** | da fare | Eliminazione dispositivo (con le sue connessioni) e singola connessione | `dettaglio.*`, `topologia-service.ts` |
 | **M7** | da fare | Persistenza: salva / carica / cancella topologia su Local Storage | `services/persistenza-service.ts`, `strumenti.*`, `topologia-service.ts` |
 | **M8** | da fare | Rifiniture, test del service, screenshot in `docs/`, `README.md` tecnico | spec, `README.md`, `docs/` |

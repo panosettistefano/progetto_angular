@@ -118,6 +118,12 @@ export class Canvas {
     this.idPremuto = null;
   }
 
+  apriDettaglio(varEvento: MouseEvent, varId: number): void {
+    varEvento.preventDefault();
+
+    this.service.apriDettaglio(varId);
+  }
+
   private distanza(varEvento: PointerEvent): number {
     return Math.hypot(varEvento.clientX - this.partenzaX, varEvento.clientY - this.partenzaY);
   }

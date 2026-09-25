@@ -23,6 +23,9 @@ export class TopologiaService {
         .map(connessione => this.creaLinea(connessione))
         .filter((linea): linea is Linea => linea != null))
 
+    dispositivoDettaglio = computed(() => this.dispositivi()
+        .find(d => d.id == this.idDettaglio()) ?? null)
+
     creaLinea(varConnessione: Connessione): Linea | null {
         const sorgente = this.dispositivi().find(d => d.id == varConnessione.sourceId)
         const destinazione = this.dispositivi().find(d => d.id == varConnessione.targetId)
@@ -123,6 +126,14 @@ export class TopologiaService {
                 targetId: varDestinazione
             }
         ])
+    }
+
+    apriDettaglio(varId: number): void {
+        this.idDettaglio.set(varId)
+    }
+
+    chiudiDettaglio(): void {
+        this.idDettaglio.set(null)
     }
 
     private collegati(varSorgente: number, varDestinazione: number): boolean {

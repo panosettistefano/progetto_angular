@@ -221,4 +221,37 @@ describe('TopologiaService', () => {
     expect(service.connessioni().length).toBe(3);
     expect(avviso).toHaveBeenCalled();
   });
+
+  it('should have no detail device when nothing is open', () => {
+    expect(service.idDettaglio()).toBeNull();
+    expect(service.dispositivoDettaglio()).toBeNull();
+  });
+
+  it('should open the detail of a device', () => {
+    popola();
+
+    service.apriDettaglio(2);
+
+    expect(service.idDettaglio()).toBe(2);
+    expect(service.dispositivoDettaglio()?.nome).toBe("Switch-01");
+  });
+
+  it('should close the detail', () => {
+    popola();
+
+    service.apriDettaglio(2);
+    service.chiudiDettaglio();
+
+    expect(service.idDettaglio()).toBeNull();
+    expect(service.dispositivoDettaglio()).toBeNull();
+  });
+
+  it('should not show a device that is no longer there', () => {
+    popola();
+
+    service.apriDettaglio(2);
+    service.dispositivi.set(service.dispositivi().filter(d => d.id != 2));
+
+    expect(service.dispositivoDettaglio()).toBeNull();
+  });
 });

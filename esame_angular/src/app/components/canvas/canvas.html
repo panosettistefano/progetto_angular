@@ -51,6 +51,7 @@
                 (pointermove)="trascina($event)"
                 (pointerup)="finisciTrascinamento($event)"
                 (pointercancel)="annullaTrascinamento($event)"
+                (contextmenu)="apriDettaglio($event, dispositivo.id)"
             >
                 <i [class]="'bi ' + iconaDispositivo(dispositivo.tipo)"></i>
                 <span class="nome">{{ dispositivo.nome }}</span>

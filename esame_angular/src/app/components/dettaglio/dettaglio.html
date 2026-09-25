@@ -1,4 +1,31 @@
-<div class="pannello p-3 mt-3">
-    <h5 class="mb-3">Dettaglio dispositivo</h5>
-    <p class="text-muted mb-0">Il pannello si aprirà con il click destro su un dispositivo.</p>
-</div>
+@if (service.dispositivoDettaglio(); as dispositivo) {
+<aside class="pannello sidebar-dettaglio p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">{{ dispositivo.nome }}</h5>
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="Chiudi il dettaglio"
+            (click)="service.chiudiDettaglio()"
+        >
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <dl class="row mb-0">
+        <dt class="col-4">Tipo</dt>
+        <dd class="col-8">{{ dispositivo.tipo }}</dd>
+
+        <dt class="col-4">IP</dt>
+        <dd class="col-8">{{ dispositivo.ip }}</dd>
+
+        <dt class="col-4">Hostname</dt>
+        <dd class="col-8">{{ dispositivo.hostname }}</dd>
+
+        <dt class="col-4">Stato</dt>
+        <dd class="col-8">
+            <span [class]="'badge ' + classeStato(dispositivo.stato)">{{ dispositivo.stato }}</span>
+        </dd>
+    </dl>
+</aside>
+}

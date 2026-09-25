@@ -242,4 +242,24 @@ describe('Canvas', () => {
     expect(router.classList.contains("selezionato")).toBe(false);
     expect(router.classList.contains("dispositivo")).toBe(true);
   });
+
+  it('should open the detail on right click', async () => {
+    const router = nodo("Router-01");
+    const evento = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+
+    router.dispatchEvent(evento);
+    await fixture.whenStable();
+
+    expect(service.idDettaglio()).toBe(1);
+    expect(evento.defaultPrevented).toBe(true);
+  });
+
+  it('should not open the detail on right click on the background', async () => {
+    const piano = fixture.nativeElement.querySelector('.piano') as HTMLElement;
+
+    piano.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true }));
+    await fixture.whenStable();
+
+    expect(service.idDettaglio()).toBeNull();
+  });
 });
