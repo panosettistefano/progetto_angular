@@ -393,3 +393,6 @@ In questo modo le due tipologie di interazione risultano chiaramente separate.
 Questo è il progetto di esame da fare. Io personalmente vorrei realizzarlo con un DB collegato con docker compose e dockerfile per avere un db veloce e contanerizzabile.
 ###
 Per quando riguarda la realizzazione bisogna fare prima il front end (in questa cartella) e poi creare successivamente il backend in un altra folder sempre dentro la cartella "Signals". La cosa importante è che adesso che hai tutti i requisiti e l'obbiettivo del progetto non è realizzare tutto in un unico ciclo ma strutturare il lavoro per step, Infatti l'output di questo promprt deve essere proprio un file .md dove Strutturi tu tutto il lavoro step by step e mi scrivi tutto quello che ne viene fuori ora da questo planning mode. 
+
+
+claude --resume 4e0c8d58-7616-4986-b28b-f67cbecebc50
