@@ -78,6 +78,7 @@ src/
     costanti.ts                     dimensioni canvas, dimensione dispositivo, soglia click/drag
     types/dispositivo.ts            Dispositivo, TipoDispositivo, StatoDispositivo
     types/connessione.ts            Connessione
+    types/collegamento.ts           Collegamento (riga "collegamenti" della sidebar)
     types/topologia.ts              Topologia (payload salvato/caricato, con "versione")
     services/topologia-service.ts   stato a signals + tutta la logica della topologia
     services/persistenza-service.ts unico punto che tocca localStorage
@@ -156,6 +157,9 @@ export type Dispositivo = {
 
 export type Connessione = { id: number, sourceId: number, targetId: number }
 
+export type Collegamento = { id: number, nome: string }   // connessione vista dalla sidebar:
+                                                          // id della connessione + nome dell'altro capo
+
 export type Topologia = {
     nome: string,
     versione: number,
@@ -179,7 +183,7 @@ prova manuale con `npx ng serve`, poi un commit git con messaggio in italiano.
 | **M3** | fatto | Drag & drop in modalità Edit con aggiornamento di `x`/`y` e limiti del canvas | `canvas.*`, `topologia-service.ts` |
 | **M4** | fatto | Modalità Edit / Connect, evidenziazione del selezionato, creazione connessione con i controlli | `strumenti.*`, `canvas.*`, `topologia-service.ts` |
 | **M5** | fatto | Dettaglio con click destro: sidebar con nome, tipo, IP, hostname, stato | `dettaglio.*`, `canvas.*`, `topologia-service.ts` |
-| **M6** | da fare | Eliminazione dispositivo (con le sue connessioni) e singola connessione | `dettaglio.*`, `topologia-service.ts` |
+| **M6** | fatto | Eliminazione dispositivo (con le sue connessioni) e singola connessione | `dettaglio.*`, `topologia-service.ts` |
 | **M7** | da fare | Persistenza: salva / carica / cancella topologia su Local Storage | `services/persistenza-service.ts`, `strumenti.*`, `topologia-service.ts` |
 | **M8** | da fare | Rifiniture, test del service, screenshot in `docs/`, `README.md` tecnico | spec, `README.md`, `docs/` |
 

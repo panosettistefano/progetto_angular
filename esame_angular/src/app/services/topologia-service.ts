@@ -1,5 +1,6 @@
 import { Service, computed, signal } from '@angular/core';
 import { ALTEZZA_CANVAS, LARGHEZZA_CANVAS } from '../costanti';
+import { Collegamento } from '../types/collegamento'
 import { Connessione } from '../types/connessione';
 import { Dispositivo, TipoDispositivo } from '../types/dispositivo';
 import { Linea } from '../types/linea';
@@ -26,6 +27,11 @@ export class TopologiaService {
     dispositivoDettaglio = computed(() => this.dispositivi()
         .find(d => d.id == this.idDettaglio()) ?? null)
 
+    connessioniDettaglio = computed(() => this.connessioni()
+        .filter(connessione => this.tocca(connessione, this.idDettaglio()))
+        .map(connessione => this.creaCollegamento(connessione, this.idDettaglio()))
+        .filter((collegamento): collegamento is Collegamento => collegamento != null))
+
     creaLinea(varConnessione: Connessione): Linea | null {
         const sorgente = this.dispositivi().find(d => d.id == varConnessione.sourceId)
         const destinazione = this.dispositivi().find(d => d.id == varConnessione.targetId)
@@ -41,6 +47,22 @@ export class TopologiaService {
             x2: destinazione.x,
             y2: destinazione.y
         }
+    }
+
+    creaCollegamento(varConnessione: Connessione, varId: number | null): Collegamento | null {
+        if (varId == null) {
+            return null
+        }
+
+        const altro = this.dispositivi().find(d => d.id == (varConnessione.sourceId == varId
+            ? varConnessione.targetId
+            : varConnessione.sourceId))
+
+        if (!altro) {
+            return null
+        }
+
+        return { id: varConnessione.id, nome: altro.nome }
     }
 
     spostaDispositivo(varId: number, varX: number, varY: number): void {
@@ -162,6 +184,43 @@ export class TopologiaService {
         this.dispositivi.update(lista => lista.map(d => d.id == varId
             ? { ...d, stato: "Offline" }
             : d))
+    }
+
+    eliminaDispositivo(varId: number): void {
+        const dispositivo = this.dispositivi().find(d => d.id == varId)
+
+        if (!dispositivo) {
+            return
+        }
+
+        if (!confirm("Eliminare " + dispositivo.nome + " e i suoi collegamenti?")) {
+            return
+        }
+
+        this.dispositivi.update(lista => lista.filter(d => d.id != varId))
+        this.connessioni.update(lista => lista.filter(c => c.sourceId != varId && c.targetId != varId))
+
+        if (this.idDettaglio() == varId) {
+            this.chiudiDettaglio()
+        }
+
+        if (this.selezionato() == varId) {
+            this.selezionato.set(null)
+        }
+    }
+
+    eliminaConnessione(varId: number): void {
+        const connessione = this.connessioni().find(c => c.id == varId)
+
+        if (!connessione) {
+            return
+        }
+
+        this.connessioni.update(lista => lista.filter(c => c.id != varId))
+    }
+
+    private tocca(varConnessione: Connessione, varId: number | null): boolean {
+        return varId != null && (varConnessione.sourceId == varId || varConnessione.targetId == varId)
     }
 
     private raggiungibili(varId: number): number[] {

@@ -122,6 +122,58 @@ describe('Dettaglio', () => {
     expect(pulsanteStato().textContent).toContain("Attiva stato");
   });
 
+  it('should list the connections of the device', async () => {
+    popola();
+    service.connessioni.set([{ id: 1, sourceId: 1, targetId: 2 }]);
+    service.apriDettaglio(1);
+    await fixture.whenStable();
+
+    const voci = fixture.nativeElement.querySelectorAll('.sidebar-dettaglio .list-group-item');
+
+    expect(voci.length).toBe(1);
+    expect(voci[0].textContent).toContain("Switch-01");
+  });
+
+  it('should say when the device has no connections', async () => {
+    popola();
+    service.apriDettaglio(1);
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelectorAll('.list-group-item').length).toBe(0);
+    expect(fixture.nativeElement.textContent).toContain("Nessun collegamento");
+  });
+
+  it('should delete the connection from its button', async () => {
+    popola();
+    service.connessioni.set([{ id: 1, sourceId: 1, targetId: 2 }]);
+    service.apriDettaglio(1);
+    await fixture.whenStable();
+
+    const pulsante = fixture.nativeElement.querySelector('.list-group-item button') as HTMLButtonElement;
+
+    pulsante.click();
+    await fixture.whenStable();
+
+    expect(service.connessioni().length).toBe(0);
+    expect(service.dispositivi().length).toBe(2);
+    expect(fixture.nativeElement.textContent).toContain("Nessun collegamento");
+  });
+
+  it('should delete the device from its button', async () => {
+    popola();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    service.apriDettaglio(1);
+    await fixture.whenStable();
+
+    const pulsante = fixture.nativeElement.querySelector('.sidebar-dettaglio .btn-danger') as HTMLButtonElement;
+
+    pulsante.click();
+    await fixture.whenStable();
+
+    expect(service.dispositivi().map(d => d.id)).toEqual([2]);
+    expect(fixture.nativeElement.querySelector('.sidebar-dettaglio')).toBeNull();
+  });
+
   it('should give a colour to every state', () => {
     expect(component.classeStato("Online")).toBe("text-bg-success");
     expect(component.classeStato("Offline")).toBe("text-bg-danger");

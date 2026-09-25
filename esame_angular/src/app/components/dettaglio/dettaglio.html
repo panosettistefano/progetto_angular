@@ -43,5 +43,35 @@
         Attivando il router arriva internet: si accendono anche gli switch e i PC collegati.
     </p>
     }
+
+    <hr>
+
+    <h6 class="mb-2">Collegamenti</h6>
+
+    @if (service.connessioniDettaglio().length == 0) {
+    <p class="text-muted small mb-0">Nessun collegamento: creane uno con la modalità Connect.</p>
+    } @else {
+    <ul class="list-group list-group-flush">
+        @for (collegamento of service.connessioniDettaglio(); track collegamento.id) {
+        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+            <span><i class="bi bi-link-45deg me-1"></i>{{ collegamento.nome }}</span>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                aria-label="Elimina il collegamento con {{ collegamento.nome }}"
+                (click)="service.eliminaConnessione(collegamento.id)"
+            >
+                <i class="bi bi-trash"></i>
+            </button>
+        </li>
+        }
+    </ul>
+    }
+
+    <hr>
+
+    <button type="button" class="btn btn-danger w-100" (click)="service.eliminaDispositivo(dispositivo.id)">
+        <i class="bi bi-trash me-1"></i>Elimina dispositivo
+    </button>
 </aside>
 }

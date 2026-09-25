@@ -301,4 +301,118 @@ describe('TopologiaService', () => {
     expect(service.dispositivi()[0].stato).toBe("Online");
     expect(service.dispositivi()[4].stato).toBe("Offline");
   });
+
+  it('should list the connections of the device in the detail', () => {
+    popola();
+
+    service.apriDettaglio(2);
+
+    expect(service.connessioniDettaglio()).toEqual([
+      { id: 1, nome: "Router-01" },
+      { id: 2, nome: "PC-01" },
+      { id: 3, nome: "PC-02" }
+    ]);
+  });
+
+  it('should name the device at the other end of the connection', () => {
+    popola();
+
+    service.apriDettaglio(1);
+
+    expect(service.connessioniDettaglio()).toEqual([{ id: 1, nome: "Switch-01" }]);
+  });
+
+  it('should have no connections in the detail of an isolated device', () => {
+    popola();
+
+    service.aggiungiDispositivo("PC");
+    service.apriDettaglio(5);
+
+    expect(service.connessioniDettaglio()).toEqual([]);
+  });
+
+  it('should delete a device and its connections after the confirm', () => {
+    popola();
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    service.eliminaDispositivo(2);
+
+    expect(service.dispositivi().map(d => d.id)).toEqual([1, 3, 4]);
+    expect(service.connessioni().length).toBe(0);
+    expect(service.linee().length).toBe(0);
+  });
+
+  it('should not delete a device when the confirm is refused', () => {
+    popola();
+
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    service.eliminaDispositivo(2);
+
+    expect(service.dispositivi().length).toBe(4);
+    expect(service.connessioni().length).toBe(3);
+  });
+
+  it('should keep the connections of the other devices', () => {
+    popola();
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    service.eliminaDispositivo(3);
+
+    expect(service.connessioni().map(c => c.id)).toEqual([1, 3]);
+  });
+
+  it('should close the detail when the open device is deleted', () => {
+    popola();
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    service.apriDettaglio(2);
+    service.eliminaDispositivo(2);
+
+    expect(service.idDettaglio()).toBeNull();
+    expect(service.dispositivoDettaglio()).toBeNull();
+  });
+
+  it('should clear the selection when the selected device is deleted', () => {
+    popola();
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    service.cambiaModalita("connect");
+    service.cliccaDispositivo(2);
+    service.eliminaDispositivo(2);
+
+    expect(service.selezionato()).toBeNull();
+  });
+
+  it('should delete a single connection', () => {
+    popola();
+
+    service.eliminaConnessione(2);
+
+    expect(service.connessioni().map(c => c.id)).toEqual([1, 3]);
+    expect(service.linee().length).toBe(2);
+  });
+
+  it('should not touch the list when the connection does not exist', () => {
+    popola();
+
+    const prima = service.connessioni();
+
+    service.eliminaConnessione(99);
+
+    expect(service.connessioni()).toBe(prima);
+  });
+
+  it('should keep the connection ids unique after a deletion', () => {
+    popola();
+
+    service.eliminaConnessione(2);
+    service.creaConnessione(3, 4);
+
+    expect(service.connessioni().map(c => c.id)).toEqual([1, 3, 4]);
+  });
 });
