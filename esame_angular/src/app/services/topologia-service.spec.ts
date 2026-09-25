@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { CHIAVE_TOPOLOGIA, VERSIONE_TOPOLOGIA } from '../costanti';
 import { Dispositivo, TipoDispositivo } from '../types/dispositivo';
+import { Topologia } from '../types/topologia';
 import { TopologiaService } from './topologia-service';
 
 describe('TopologiaService', () => {
@@ -8,6 +10,7 @@ describe('TopologiaService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(TopologiaService);
+    localStorage.clear();
   });
 
   function dispositivo(varId: number, varTipo: TipoDispositivo, varNome: string, varX: number, varY: number): Dispositivo {
@@ -414,5 +417,110 @@ describe('TopologiaService', () => {
     service.creaConnessione(3, 4);
 
     expect(service.connessioni().map(c => c.id)).toEqual([1, 3, 4]);
+  });
+
+  it('should save and load the whole topology', () => {
+    popola();
+
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    service.salvaTopologia();
+
+    service.aggiungiDispositivo("PC");
+    service.spostaDispositivo(1, 10, 10);
+    service.eliminaConnessione(1);
+
+    expect(service.dispositivi().length).toBe(5);
+    expect(service.connessioni().length).toBe(2);
+
+    service.caricaTopologia();
+
+    expect(service.dispositivi().length).toBe(4);
+    expect(service.dispositivi()[0].x).toBe(600);
+    expect(service.dispositivi()[0].y).toBe(120);
+    expect(service.connessioni().map(c => c.id)).toEqual([1, 2, 3]);
+    expect(service.linee().length).toBe(3);
+  });
+
+  it('should write the version and the name in the saved payload', () => {
+    popola();
+
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    service.salvaTopologia();
+
+    const salvata = JSON.parse(localStorage.getItem(CHIAVE_TOPOLOGIA) as string) as Topologia;
+
+    expect(salvata.versione).toBe(VERSIONE_TOPOLOGIA);
+    expect(salvata.nome).toBe("Rete laboratorio");
+    expect(salvata.dispositivi.length).toBe(4);
+    expect(salvata.connessioni.length).toBe(3);
+  });
+
+  it('should warn when there is nothing to load', () => {
+    const avviso = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    service.caricaTopologia();
+
+    expect(avviso).toHaveBeenCalled();
+    expect(service.dispositivi().length).toBe(0);
+  });
+
+  it('should warn when the storage cannot save', () => {
+    popola();
+
+    const avviso = vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    vi.spyOn(service.persistenza, "salva").mockReturnValue(false);
+
+    service.salvaTopologia();
+
+    expect(avviso).toHaveBeenCalledWith("Non è stato possibile salvare: lo spazio del browser non è disponibile.");
+  });
+
+  it('should close the detail and the selection when a topology is loaded', () => {
+    popola();
+
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+
+    service.salvaTopologia();
+
+    service.apriDettaglio(2);
+    service.cambiaModalita("connect");
+    service.cliccaDispositivo(2);
+
+    service.caricaTopologia();
+
+    expect(service.idDettaglio()).toBeNull();
+    expect(service.selezionato()).toBeNull();
+    expect(service.modalita()).toBe("connect");
+  });
+
+  it('should empty the canvas when the topology is deleted', () => {
+    popola();
+
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    service.salvaTopologia();
+    service.cancellaTopologia();
+
+    expect(service.dispositivi().length).toBe(0);
+    expect(service.connessioni().length).toBe(0);
+    expect(service.linee().length).toBe(0);
+    expect(service.persistenza.carica()).toBeNull();
+  });
+
+  it('should keep everything when the deletion is refused', () => {
+    popola();
+
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    service.salvaTopologia();
+    service.cancellaTopologia();
+
+    expect(service.dispositivi().length).toBe(4);
+    expect(service.persistenza.carica()?.dispositivi.length).toBe(4);
   });
 });

@@ -1,12 +1,16 @@
-import { Service, computed, signal } from '@angular/core';
-import { ALTEZZA_CANVAS, LARGHEZZA_CANVAS } from '../costanti';
+import { Service, computed, inject, signal } from '@angular/core';
+import { ALTEZZA_CANVAS, LARGHEZZA_CANVAS, VERSIONE_TOPOLOGIA } from '../costanti';
 import { Collegamento } from '../types/collegamento'
 import { Connessione } from '../types/connessione';
 import { Dispositivo, TipoDispositivo } from '../types/dispositivo';
 import { Linea } from '../types/linea';
+import { Topologia } from '../types/topologia';
+import { PersistenzaService } from './persistenza-service';
 
 @Service()
 export class TopologiaService {
+
+    persistenza = inject(PersistenzaService)
 
     nome = signal("Rete laboratorio")
 
@@ -217,6 +221,63 @@ export class TopologiaService {
         }
 
         this.connessioni.update(lista => lista.filter(c => c.id != varId))
+    }
+
+    salvaTopologia(): void {
+        if (this.persistenza.salva(this.creaTopologia())) {
+            alert("Topologia salvata.")
+            return
+        }
+
+        alert("Non è stato possibile salvare: lo spazio del browser non è disponibile.")
+    }
+
+    caricaTopologia(): void {
+        const topologia = this.persistenza.carica()
+
+        if (!topologia) {
+            alert("Non c'è nessuna topologia salvata da caricare.")
+            return
+        }
+
+        this.applicaTopologia(topologia)
+        alert("Topologia caricata.")
+    }
+
+    cancellaTopologia(): void {
+        if (!confirm("Cancellare la topologia salvata e svuotare il canvas?")) {
+            return
+        }
+
+        this.persistenza.cancella()
+        this.applicaTopologia(this.topologiaVuota())
+        alert("Topologia cancellata.")
+    }
+
+    private creaTopologia(): Topologia {
+        return {
+            nome: this.nome(),
+            versione: VERSIONE_TOPOLOGIA,
+            dispositivi: this.dispositivi(),
+            connessioni: this.connessioni()
+        }
+    }
+
+    private topologiaVuota(): Topologia {
+        return {
+            nome: this.nome(),
+            versione: VERSIONE_TOPOLOGIA,
+            dispositivi: [],
+            connessioni: []
+        }
+    }
+
+    private applicaTopologia(varTopologia: Topologia): void {
+        this.nome.set(varTopologia.nome)
+        this.dispositivi.set(varTopologia.dispositivi)
+        this.connessioni.set(varTopologia.connessioni)
+        this.selezionato.set(null)
+        this.chiudiDettaglio()
     }
 
     private tocca(varConnessione: Connessione, varId: number | null): boolean {

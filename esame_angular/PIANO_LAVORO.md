@@ -29,7 +29,7 @@ Lo sviluppo è diviso in **due fasi**:
 - [x] le linee si aggiornano automaticamente quando un dispositivo viene spostato
 - [x] **click destro** su un dispositivo → dettaglio (nome, tipo, IP, hostname, stato) in una **sidebar**
 - [x] modalità **Edit / Connect** separate (bonus avanzato)
-- [ ] **salva / carica / cancella topologia** su Local Storage, e poi anche sul server
+- [ ] **salva / carica / cancella topologia**: su Local Storage **fatto** (M7), sul server in fase 2 (B4)
 - [ ] `README.md` con descrizione, tecnologie, architettura, modello dati, istruzioni di avvio e
       **screenshot reali** in `docs/`
 
@@ -138,6 +138,28 @@ Primo click → il dispositivo diventa `selezionato` ed è evidenziato. Secondo 
 dispositivo → nasce la connessione. Con due controlli: **niente collegamento di un dispositivo a sé
 stesso** e **niente connessioni duplicate** (verificate in entrambi i versi), con `alert()` di avviso.
 
+### Persistenza locale
+
+I pulsanti **Salva / Carica / Cancella** della toolbar lavorano su un solo oggetto `Topologia`, che è
+anche il payload della fase 2:
+
+```ts
+{ nome, versione, dispositivi: [...], connessioni: [...] }
+```
+
+- `PersistenzaService` è l'**unico** punto che tocca `localStorage` (chiave `topologia-rete`), con
+  `try/catch`: se lo storage rifiuta la scrittura (spazio pieno, modalità privata) `salva()` torna
+  `false` e il service principale avvisa invece di rompersi.
+- `carica()` valida il JSON prima di restituirlo (nome, `dispositivi` e `connessioni` come array): un
+  contenuto corrotto o di un'altra applicazione diventa `null`, non un errore a schermo.
+- `caricaTopologia()` riporta nello stato nome, dispositivi e connessioni e azzera selezione e
+  sidebar, perché gli id caricati potrebbero non esistere più.
+- `cancellaTopologia()` chiede `confirm()`, svuota canvas e storage.
+- L'esito di ogni comando è un `alert()`: salvato, caricato, cancellato, oppure il motivo del rifiuto.
+
+In fase 2 questo strato resta e gli si affianca `TopologiaApiService`: la toolbar guadagna i pulsanti
+del server e canvas, sidebar e logica della topologia non cambiano.
+
 ## 4. Modello dati
 
 ```ts
@@ -184,7 +206,7 @@ prova manuale con `npx ng serve`, poi un commit git con messaggio in italiano.
 | **M4** | fatto | Modalità Edit / Connect, evidenziazione del selezionato, creazione connessione con i controlli | `strumenti.*`, `canvas.*`, `topologia-service.ts` |
 | **M5** | fatto | Dettaglio con click destro: sidebar con nome, tipo, IP, hostname, stato | `dettaglio.*`, `canvas.*`, `topologia-service.ts` |
 | **M6** | fatto | Eliminazione dispositivo (con le sue connessioni) e singola connessione | `dettaglio.*`, `topologia-service.ts` |
-| **M7** | da fare | Persistenza: salva / carica / cancella topologia su Local Storage | `services/persistenza-service.ts`, `strumenti.*`, `topologia-service.ts` |
+| **M7** | fatto | Persistenza: salva / carica / cancella topologia su Local Storage | `services/persistenza-service.ts`, `strumenti.*`, `topologia-service.ts` |
 | **M8** | da fare | Rifiniture, test del service, screenshot in `docs/`, `README.md` tecnico | spec, `README.md`, `docs/` |
 
 ## 6. Fase 2 — Backend REST + MySQL in Docker (`../esame_backend`)
